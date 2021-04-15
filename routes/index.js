@@ -15,6 +15,8 @@ router.use('/authenticate', require('./authenticate'));
 
 router.use('/api', [auth], require('./api'));
 
+router.use('/files', [auth], require('./files'));
+
 // Root route - not found response 
 router.use('/', (req, res) => {
   res.status(404).json({ error: 'Resource not found.' });

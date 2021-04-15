@@ -11,6 +11,7 @@ The api has an endpoint to obtain an auth token that allows access to other endp
 Application is using Nodejs 12.
 Run `npm instal` from the root of the project to install all the dependencies.
 Create `.env` file from versioned `.env-example` to set the necessary environment variables. All the default values from the example file can be used to run the app properly.
+Local file system is being used to store uploaded files. To start using the feature - create `uploadedFiles` directory at the root of the project.
 Run `npm start` to start the app in development mode. Using modemon to watch for file changes.
 The API should be available at `http://localhost:5000`.
 > Note: Follow instruction on the fronend app side to start using the api.
