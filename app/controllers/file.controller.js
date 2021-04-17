@@ -4,19 +4,28 @@ const AppError = require('../errors/app.error');
 const Busboy = require('busboy');
 const fs = require('fs');
 const path = require('path');
+// require.main.filename is not reliable in some cases - like when using pm2 as process manager
 const fileUploadDir = path.join(path.dirname(require.main.filename), 'uploadedFiles');
 const storageDriver = new FileSystemDriver(fileUploadDir);
 const fileModel = new FileModel(storageDriver);
+const allowedFileTypes = ['application/gzip', 'application/x-gzip', 'application/tar+gzip'];
 
 class FileController {
 
   async store(req) {
     return new Promise((resolve, reject) => {
       const busboy = new Busboy({ headers: req.headers });
-      busboy.on('file', (fieldname, file, filename) => {
-        // require.main.filename is not reliable in some cases - like when using pm2 as process manager
+      busboy.on('file', (fieldname, file, filename, enc, mimeType) => {
+        // Validate file type
+        if (!allowedFileTypes.includes(mimeType)) {
+          reject(new AppError('Invalid file type.', 400, 'P-1050'));
+          return;
+        }
+        
+        // Escape all chars except for alpha-numerics underscores and periods
         const safeFileName = filename.replace(/[^A-Za-z0-9_\.]+/g, '_');
         const savePath = path.join(fileUploadDir, safeFileName);
+        
         // Streaming file to disk - in real life files will likely go to S3 or some other cloud storage
         file.pipe(fs.createWriteStream(savePath));
       });
