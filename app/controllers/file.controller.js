@@ -15,7 +15,8 @@ class FileController {
       const busboy = new Busboy({ headers: req.headers });
       busboy.on('file', (fieldname, file, filename) => {
         // require.main.filename is not reliable in some cases - like when using pm2 as process manager
-        const savePath = path.join(fileUploadDir, filename);
+        const safeFileName = filename.replace(/[^A-Za-z0-9_\.]+/g, '_');
+        const savePath = path.join(fileUploadDir, safeFileName);
         // Streaming file to disk - in real life files will likely go to S3 or some other cloud storage
         file.pipe(fs.createWriteStream(savePath));
       });
